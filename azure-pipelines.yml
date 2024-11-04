@@ -1,0 +1,54 @@
+trigger:
+  branches:
+    include:
+      - main  # Trigger the pipeline when changes are pushed to the 'main' branch
+ 
+pool:
+  vmImage: 'ubuntu-latest'
+ 
+variables:
+  TF_VERSION: '1.5.0'  # Specify the Terraform version to use
+  WORKING_DIRECTORY: 'terraform'  # Directory where your product_type.tf file is located
+ 
+  # commercetools credentials (store these securely in Azure DevOps Library)
+  COMMERCETOOLS_PROJECT_KEY: naga-demo-project1
+  COMMERCETOOLS_CLIENT_ID: OJ0FbNgxAEnhEOW4VMTD33UM
+  COMMERCETOOLS_CLIENT_SECRET: pT4hZceyb29ZA6a8CeCJMlqgMyKSVE9F
+ 
+steps:
+  # Step 1: Check out the code from GitHub
+  - task: Checkout@1
+    displayName: 'Checkout Code from GitHub'
+ 
+  # Step 2: Install Terraform CLI
+  - task: TerraformInstaller@0
+    inputs:
+      terraformVersion: $(TF_VERSION)
+    displayName: 'Install Terraform $(TF_VERSION)'
+ 
+  # Step 3: Initialize Terraform
+  - script: |
+      terraform init
+    displayName: 'Initialize Terraform'
+    workingDirectory: $(WORKING_DIRECTORY)
+ 
+  # Step 4: Validate Terraform Configuration
+  - script: |
+      terraform validate
+    displayName: 'Validate Terraform Configuration'
+    workingDirectory: $(WORKING_DIRECTORY)
+ 
+  # Step 5: Plan Terraform Deployment
+  - script: |
+      terraform plan -out=tfplan \
+        -var "commercetools_project_key=$(COMMERCETOOLS_PROJECT_KEY)" \
+        -var "commercetools_client_id=$(COMMERCETOOLS_CLIENT_ID)" \
+        -var "commercetools_client_secret=$(COMMERCETOOLS_CLIENT_SECRET)"
+    displayName: 'Plan Terraform Deployment'
+    workingDirectory: $(WORKING_DIRECTORY)
+ 
+  # Step 6: Apply Terraform Plan (optional, enable if ready to apply changes)
+  - script: |
+      terraform apply -auto-approve tfplan
+    displayName: 'Apply Terraform Plan'
+    workingDirectory: $(WORKING_DIRECTORY)
