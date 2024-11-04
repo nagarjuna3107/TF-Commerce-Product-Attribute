@@ -5,11 +5,11 @@ trigger:
  
 pool:
   vmImage: 'ubuntu-latest'
- 
+
 variables:
-  TF_VERSION: '1.5.0'  # Specify the Terraform version to use
-  WORKING_DIRECTORY: 'terraform'  # Directory where your product_type.tf file is located
- 
+  group: terraform  # Reference to the Variable Group
+  TF_VERSION: '1.5.0'  # Inline variable
+  WORKING_DIRECTORY: 'terraform'  # Inline variable 
   # commercetools credentials (store these securely in Azure DevOps Library)
   COMMERCETOOLS_PROJECT_KEY: $(COMMERCETOOLS_PROJECT_KEY)
   COMMERCETOOLS_CLIENT_ID: $(COMMERCETOOLS_CLIENT_ID)
