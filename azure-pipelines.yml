@@ -11,9 +11,9 @@ variables:
   WORKING_DIRECTORY: 'terraform'  # Directory where your product_type.tf file is located
  
   # commercetools credentials (store these securely in Azure DevOps Library)
-  COMMERCETOOLS_PROJECT_KEY: naga-demo-project1
-  COMMERCETOOLS_CLIENT_ID: OJ0FbNgxAEnhEOW4VMTD33UM
-  COMMERCETOOLS_CLIENT_SECRET: pT4hZceyb29ZA6a8CeCJMlqgMyKSVE9F
+  COMMERCETOOLS_PROJECT_KEY: $(COMMERCETOOLS_PROJECT_KEY)
+  COMMERCETOOLS_CLIENT_ID: $(COMMERCETOOLS_CLIENT_ID)
+  COMMERCETOOLS_CLIENT_SECRET: $(COMMERCETOOLS_CLIENT_SECRET)
  
 steps:
   # Step 1: Check out the code from GitHub
