@@ -1,54 +1,21 @@
 trigger:
-  branches:
-    include:
-      - master  # Trigger the pipeline when changes are pushed to the 'main' branch
+  - master  # Adjust based on your branch name
  
 pool:
   vmImage: 'ubuntu-latest'
-
-variables:
-  group: terraform  # Reference to the Variable Group
-  TF_VERSION: '1.5.0'  # Inline variable
-  WORKING_DIRECTORY: 'terraform'  # Inline variable 
-  # commercetools credentials (store these securely in Azure DevOps Library)
-  COMMERCETOOLS_PROJECT_KEY: $(COMMERCETOOLS_PROJECT_KEY)
-  COMMERCETOOLS_CLIENT_ID: $(COMMERCETOOLS_CLIENT_ID)
-  COMMERCETOOLS_CLIENT_SECRET: $(COMMERCETOOLS_CLIENT_SECRET)
  
 steps:
-  # Step 1: Check out the code from GitHub
-  - task: Checkout@1
-    displayName: 'Checkout Code from GitHub'
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: '1.6.0'
  
-  # Step 2: Install Terraform CLI
-  - task: TerraformInstaller@0
-    inputs:
-      terraformVersion: $(TF_VERSION)
-    displayName: 'Install Terraform $(TF_VERSION)'
- 
-  # Step 3: Initialize Terraform
-  - script: |
-      terraform init
-    displayName: 'Initialize Terraform'
-    workingDirectory: $(WORKING_DIRECTORY)
- 
-  # Step 4: Validate Terraform Configuration
-  - script: |
-      terraform validate
-    displayName: 'Validate Terraform Configuration'
-    workingDirectory: $(WORKING_DIRECTORY)
- 
-  # Step 5: Plan Terraform Deployment
-  - script: |
-      terraform plan -out=tfplan \
-        -var "commercetools_project_key=$(COMMERCETOOLS_PROJECT_KEY)" \
-        -var "commercetools_client_id=$(COMMERCETOOLS_CLIENT_ID)" \
-        -var "commercetools_client_secret=$(COMMERCETOOLS_CLIENT_SECRET)"
-    displayName: 'Plan Terraform Deployment'
-    workingDirectory: $(WORKING_DIRECTORY)
- 
-  # Step 6: Apply Terraform Plan (optional, enable if ready to apply changes)
-  - script: |
-      terraform apply -auto-approve tfplan
-    displayName: 'Apply Terraform Plan'
-    workingDirectory: $(WORKING_DIRECTORY)
+# Step 1: Initialize, Plan, and Apply
+- script: |
+    terraform init
+    terraform plan
+    terraform apply -auto-approve
+  env:
+    TF_VAR_project_key: $(PROJECT_KEY)
+    TF_VAR_client_id: $(CLIENT_ID)
+    TF_VAR_client_secret: $(CLIENT_SECRET)
+  displayName: 'Initialize, Plan, and Apply Terraform'
